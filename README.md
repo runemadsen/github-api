@@ -1,35 +1,49 @@
 Installation
 ------------
 
+NB: This is a super early version of this gem. Use only for testing purposes
+
 To install the gem, simply run:
 
-    gem install 'github-oauth'
+    gem install 'github-api'
 
 Or the bundler equivalent:
 
-    bundle install 'github-oauth'
+    bundle install 'github-api'
 
 Examples
 --------
 
-This is a simple example on how to use the gem (here using sinatra routes). The gem will use the "callback_url" from your Github application OAuth settings (in this case I set it to http://mysite.com/oauth).
+Use the gem to create / retrieve Github repo data. You can use my 'github-oauth' gem to get the token.
 
-    require 'github-oauth'    
+    # use oauth token to create a user object
+    @user = GithubApi::User.new(ab3cd9j4ks73hf7)
 
-    get '/' do
-      unless session[:access_token]
-        redirect GithubOAuth.authorize_url('github_client_id', 'github_client_secret')
-      end
-      "You have authenticated"
-    end
+Then create stuff
+    
+    @user.has_repo?("my_repo_name")
 
-    get '/oauth' do
-      session[:access_token] = GithubOAuth.token('github_client_id', 'github_client_secret', params[:code])
-      redirect '/'
-    end
+    repo = @user.create_repo("githunch_bookmarks", {
+      :description => "Repository for Githunch Bookmarks",
+      :homepage => "http://githunch.heroku.com",
+      :public => true,
+      :has_issues => false,
+      :has_wiki => false,
+      :has_downloads => false
+    })
 
-You can specify the specific scope for the authenticating user:
+    file = GithubApi::Blob.new(:content => "this is my content", :path => "bookmarks.json")
+    tree = repo.create_tree([file])
 
-    redirect GithubOAuth.authorize_url('github_client_id', 'github_client_secret', 'gist')
+    commit = repo.create_initial_commit(tree.data["sha"], "This is my commit text")
 
-I'm planning on releasing my GithubAPI gem that takes this token and makes read/write operations to the Github API super simple.
+    reference = repo.create_ref("refs/heads/master", commit.data["sha"])
+
+Or retrieve stuff
+
+    blob = repo.ref("heads/master").commit.tree.file("bookmarks.json")
+	  puts blob.content
+
+   
+
+   
