@@ -1,5 +1,3 @@
-module Github
-  module Api
-    VERSION = "0.0.1"
-  end
+module GithubApi
+  VERSION = "0.0.1"
 end
