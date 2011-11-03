@@ -16,7 +16,8 @@ Examples
 
 Use the gem to create / retrieve Github repo data. You can use my 'github-oauth' gem to get the token.
 
-    # use oauth token to create a user object
+Use oauth token to create a user object
+
     @user = GithubApi::User.new(ab3cd9j4ks73hf7)
 
 Then create stuff
@@ -42,7 +43,7 @@ Then create stuff
 Or retrieve stuff
 
     blob = repo.ref("heads/master").commit.tree.file("bookmarks.json")
-	  puts blob.content
+    puts blob.content
 
    
 
