@@ -17,7 +17,6 @@ class Repo
   # ------------------------------------------------------------------------------
   
   def tree(sha)
-    puts "SHA: #{sha}"
     # TODO: it may be smart to just load all trees at one time
     tre = @trees.find { |t| t.data["sha"] == sha }
     if tre.nil?
@@ -110,11 +109,12 @@ class Repo
     blo = @blobs.find { |b| b.data["sha"] == sha }
     if blo.nil?
       response = GithubApi::HTTP.get("/repos/#{@user.data['login']}/#{@name}/git/blobs/" + sha,
-        :headers => {
-          'Content-Type' => 'application/vnd.github.beta.raw' 
-        }
-      ).parsed_response
-      blo = GithubApi::Blob.new(response)
+      :format => nil,
+      :headers => {
+       "Accept" => "application/vnd.github.beta.raw+json" 
+      }
+      ).body
+      blo = GithubApi::Blob.new(:content => response, :sha => sha)
       @blobs << blo
     end
     blo
